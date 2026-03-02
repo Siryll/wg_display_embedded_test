@@ -11,17 +11,25 @@ The API available can be explored [here](https://eliabieri.github.io/wg_display_
 ## 🛠️ Development
 
 You need to have [Rust](https://www.rust-lang.org/tools/install) installed to develop a widget.  
-Next, you need to add the `wasm32-wasip2` target to your Rust installation. This can be done by running the following command:
+Next, add the `wasm32-unknown-unknown` target to your Rust installation:
 
 ```bash
-rustup target add wasm32-wasip2
+rustup target add wasm32-unknown-unknown
 ```
 
-To then build your widget, run the following command:
+To build a widget for the embedded no_std runtime, use this pipeline:
 
 ```bash
-# Build widget
-cargo build --target wasm32-wasip2 --release
+# 1) Build core wasm module
+cargo build --target wasm32-unknown-unknown --release
+
+# 2) Turn module into a component
+wasm-tools component new target/wasm32-unknown-unknown/release/widget.wasm -o widget.component.wasm
+
+# 3) Precompile component for device/runtime
+# (example using this workspace tool)
+cd ../wasm-tools
+./target/release/wasm-precompiler ../wg_display_embedded_test/widget/widget.component.wasm widget_tests/test_widget.compiled
 ```
 
 The resulting WebAssembly component can be installed on the WG Display by starting a local web server and supplying the URL of the component to the WG Display Web Dashboard install page.

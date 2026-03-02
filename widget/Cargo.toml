@@ -7,5 +7,5 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = "0.34.0"
+wit-bindgen = { version = "0.53.1", default-features = false, features = ["macros", "realloc"] }
 dlmalloc = { version = "0.2.11", features = ["global"] }
