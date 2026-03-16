@@ -5,6 +5,8 @@ extern crate alloc;
 use alloc::format;
 use alloc::string::String;
 use core::panic::PanicInfo;
+use schemars::{schema_for, JsonSchema};
+use serde::Deserialize;
 
 use widget::widget::{clocks, http, logging, random};
 
@@ -21,6 +23,11 @@ static ALLOCATOR: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
 #[panic_handler]
 fn panic(_info: &PanicInfo<'_>) -> ! {
     loop {}
+}
+
+#[derive(JsonSchema, Deserialize)]
+struct WidgetConfig {
+    test: String,
 }
 
 struct MyWidget;
@@ -113,8 +120,9 @@ impl Guest for MyWidget {
         }
     }
 
-    fn get_config_schema() -> String {
-        "{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}".into()
+    fn get_config_schema() -> String  {
+        let schema = schema_for!(WidgetConfig);
+        serde_json::to_string_pretty(&schema).unwrap()
     }
 
     fn get_version() -> String {

@@ -25,11 +25,19 @@ jobs:
     - name: Validate WIT
       run: wasm-tools component wit wg_display_widget_wit/wit
     - name: Add WASM target
-      run: rustup target add wasm32-wasip2
+      run: rustup target add wasm32-unknown-unknown
     - name: Build
       working-directory: ./widget
-      run: cargo build --target wasm32-wasip2 --release
+      run: cargo build --target wasm32-unknown-unknown --release
+    - name: Convert to component
+      working-directory: ./widget
+      run: wasm-tools component new target/wasm32-unknown-unknown/release/widget.wasm -o widget.component.wasm
+    - name: Build precompiler
+      working-directory: ./wg_display_embedded_precompiler
+      run: cargo build --release
+    - name: Precompile component for ESP32
+      run: ./wg_display_embedded_precompiler/target/release/wg-display-embedded-precompiler widget/widget.component.wasm  widget.precompiled.wasm
     - uses: ncipollo/release-action@v1
       with:
-          artifacts: "widget/target/wasm32-wasip2/release/widget.wasm"
+          artifacts: "widget.precompiled.wasm"
           artifactErrorsFailBuild: true
